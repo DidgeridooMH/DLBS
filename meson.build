@@ -11,7 +11,7 @@ deps = [
 src = [
   'src/main.cpp',
   'src/multithread/HotThread.cpp',
-  'src/net/TcpServer.cpp'
+  'src/net/TcpClient.cpp'
 ]
 
 executable('dlbs',
