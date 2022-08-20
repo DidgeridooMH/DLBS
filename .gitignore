@@ -1,0 +1,5 @@
+.vim
+builddir
+subprojects/*
+!subprojects/*.wrap
+
