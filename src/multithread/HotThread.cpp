@@ -1,4 +1,4 @@
-#include <multithread/HotThread.hpp>
+#include "multithread/HotThread.hpp"
 
 namespace dlbs {
 HotThread::HotThread() : m_state(ThreadState::Stopped) {}
