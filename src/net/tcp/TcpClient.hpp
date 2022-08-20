@@ -7,6 +7,7 @@
 #include <vector>
 
 namespace dlbs {
+
 class TcpClient : public HotThread {
  public:
   TcpClient(int fd, const std::string& address, uint16_t port);
@@ -21,5 +22,6 @@ class TcpClient : public HotThread {
   std::string m_address;
   uint16_t m_port;
   std::vector<NetFilter> m_filters;
+  EndPointContext m_context;
 };
 }  // namespace dlbs

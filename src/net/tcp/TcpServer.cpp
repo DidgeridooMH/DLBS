@@ -1,5 +1,5 @@
-#include <net/TcpServer.hpp>
 #include <net/filters/HttpFilter.hpp>
+#include <net/tcp/TcpServer.hpp>
 
 extern "C" {
 #include <arpa/inet.h>

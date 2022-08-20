@@ -1,19 +1,24 @@
 #include <fmt/format.h>
 
 #include <exception>
-#include <net/EndpointConnection.hpp>
 #include <net/NetUtils.hpp>
-#include <net/TcpClient.hpp>
+#include <net/endpoint/EndpointConnection.hpp>
 #include <net/filters/HttpFilter.hpp>
+#include <net/tcp/TcpClient.hpp>
 
 extern "C" {
 #include <unistd.h>
 }
 
+using namespace std::chrono;
+using namespace std::chrono_literals;
+
 namespace dlbs {
 TcpClient::TcpClient(int fd, const std::string& address, uint16_t port)
-    : m_fd(fd), m_address(address), m_port(port) {
-  // TODO: Make debug logging
+    : m_fd(fd),
+      m_address(address),
+      m_port(port),
+      m_context(EndPointContext{.keepAlive = false}) {
   fmt::print("[DEBUG] - Client connected at {}:{}\n", address, port);
 }
 
@@ -23,13 +28,16 @@ void TcpClient::RunHandler() {
   NetBuffer buffer(16 * 1024);
   size_t size = 0;
 
-  while (GetState() != ThreadState::Stopping && size != buffer.size()) {
+  auto timeout = steady_clock::now();
+  while (GetState() != ThreadState::Stopping && size != buffer.size() &&
+         (steady_clock::now() - timeout) < 5s) {
     auto len = read(m_fd, buffer.data() + size, buffer.size() - size);
     if (len > 0) {
+      timeout = steady_clock::now();
       size += len;
       try {
         for (const auto& f : m_filters) {
-          f(buffer, size);
+          f(buffer, size, m_context);
         }
 
         auto endPointConnection = EndPointConnection("127.0.0.1", 3000);
@@ -40,6 +48,7 @@ void TcpClient::RunHandler() {
         write(m_fd, message.data(), message.size());
 
       } catch (const InternalServerException& e) {
+        fmt::print("Internal server error: {}\n", e.what());
         std::string iseDocument =
             "<!DOCTYPE html><html><head><title>Internal Server "
             "Error</title></head><body><h1>Oops something went "
@@ -70,8 +79,12 @@ void TcpClient::RunHandler() {
           message.length(), message);
       write(m_fd, request.c_str(), request.length());
 
-      break;
-    } else if (errno != EWOULDBLOCK && errno != EAGAIN) {
+      if (m_context.keepAlive) {
+        size = 0;
+      } else {
+        break;
+      }
+    } else if (len == 0 && errno != EWOULDBLOCK && errno != EAGAIN) {
       break;
     }
 
