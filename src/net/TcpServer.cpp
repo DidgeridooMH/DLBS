@@ -1,4 +1,5 @@
 #include <net/TcpServer.hpp>
+#include <net/filters/HttpFilter.hpp>
 
 extern "C" {
 #include <arpa/inet.h>
@@ -56,6 +57,7 @@ void TcpServer::RunHandler() {
       auto client = std::make_unique<TcpClient>(
           clientFd, inet_ntoa(clientAddress.sin_addr),
           ntohs(clientAddress.sin_port));
+      client->AddFilter(filters::http);
       m_clients.insert({clientAddress.sin_port, std::move(client)});
       m_clients.at(clientAddress.sin_port)->Run();
     } else if (errno != EWOULDBLOCK && errno != EAGAIN) {

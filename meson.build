@@ -12,7 +12,8 @@ src = [
   'src/main.cpp',
   'src/multithread/HotThread.cpp',
   'src/net/TcpClient.cpp',
-  'src/net/TcpServer.cpp'
+  'src/net/TcpServer.cpp',
+  'src/net/filters/HttpFilter.cpp'
 ]
 
 executable('dlbs',
