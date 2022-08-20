@@ -1,6 +1,6 @@
-#include <fmt/format.h>
+#include "net/filters/HttpFilter.hpp"
 
-#include <net/filters/HttpFilter.hpp>
+#include <fmt/format.h>
 
 #include "net/NetUtils.hpp"
 

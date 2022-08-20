@@ -1,10 +1,12 @@
+#include "net/tcp/TcpClient.hpp"
+
 #include <fmt/format.h>
 
 #include <exception>
-#include <net/NetUtils.hpp>
-#include <net/endpoint/EndpointConnection.hpp>
-#include <net/filters/HttpFilter.hpp>
-#include <net/tcp/TcpClient.hpp>
+
+#include "net/NetUtils.hpp"
+#include "net/endpoint/EndPointConnection.hpp"
+#include "net/filters/HttpFilter.hpp"
 
 extern "C" {
 #include <unistd.h>
