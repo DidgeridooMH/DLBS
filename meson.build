@@ -3,13 +3,16 @@ project('dlbs', 'cpp',
   default_options : ['warning_level=3', 'cpp_std=c++20'])
 
 fmt = dependency('fmt')
+json = dependency('nlohmann_json')
 
 deps = [
-  fmt
+  fmt,
+  json
 ]
 
 src = [
   'src/main.cpp',
+  'src/config/Config.cpp',
   'src/multithread/HotThread.cpp',
   'src/net/tcp/TcpClient.cpp',
   'src/net/tcp/TcpServer.cpp',

@@ -1,5 +1,6 @@
 #include "net/tcp/TcpServer.hpp"
 
+#include "config/Config.hpp"
 #include "net/filters/HttpFilter.hpp"
 
 extern "C" {
@@ -53,10 +54,6 @@ void TcpServer::RunHandler() {
 
   fmt::print("Server started on port {}\n", m_port);
 
-  const std::vector<std::pair<uint32_t, uint16_t>> endPointList = {
-      {inet_addr("127.0.0.1"), 3000},
-      {inet_addr("127.0.0.1"), 3001},
-      {inet_addr("127.0.0.1"), 3002}};
   size_t epIndex = 0;
 
   while (GetState() != ThreadState::Stopping) {
@@ -65,11 +62,11 @@ void TcpServer::RunHandler() {
     int clientFd = accept(m_fd, reinterpret_cast<sockaddr *>(&clientAddress),
                           &addressLength);
     if (clientFd >= 0) {
+      auto endPoint = Config::GetInstance()->GetEndPoint(epIndex);
       auto client = std::make_unique<TcpClient>(
           clientFd, inet_ntoa(clientAddress.sin_addr),
-          ntohs(clientAddress.sin_port), endPointList[epIndex].first,
-          endPointList[epIndex].second);
-      epIndex = (epIndex + 1) % endPointList.size();
+          ntohs(clientAddress.sin_port), endPoint.first, endPoint.second);
+      epIndex = (epIndex + 1) % Config::GetInstance()->GetNumOfEndPoints();
       client->AddFilter(filters::http);
       m_clients.insert({clientAddress.sin_port, std::move(client)});
       m_clients.at(clientAddress.sin_port)->Run();
