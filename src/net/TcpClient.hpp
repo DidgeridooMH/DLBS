@@ -2,15 +2,16 @@
 
 #include <memory>
 #include <multithread/HotThread.hpp>
-#include <net/NetLayer.hpp>
-#include <stack>
+#include <optional>
 #include <vector>
 
 namespace dlbs {
-class TcpClient : public HotThread, NetLayer {
+typedef std::vector<uint8_t> NetBuffer;
+typedef std::function<bool(NetBuffer&, size_t)> NetFilter;
+
+class TcpClient : public HotThread {
  public:
   TcpClient(int fd, const std::string& address, uint16_t port);
-  ~TcpClient();
 
  protected:
   void RunHandler() override;
@@ -19,5 +20,6 @@ class TcpClient : public HotThread, NetLayer {
   int m_fd;
   std::string m_address;
   uint16_t m_port;
+  std::vector<NetFilter> m_filters;
 };
 }  // namespace dlbs
