@@ -1,7 +1,10 @@
 #include <fmt/format.h>
 
+#include <exception>
+#include <net/EndpointConnection.hpp>
 #include <net/NetUtils.hpp>
 #include <net/TcpClient.hpp>
+#include <net/filters/HttpFilter.hpp>
 
 extern "C" {
 #include <unistd.h>
@@ -28,6 +31,14 @@ void TcpClient::RunHandler() {
         for (const auto& f : m_filters) {
           f(buffer, size);
         }
+
+        auto endPointConnection = EndPointConnection("127.0.0.1", 3000);
+        endPointConnection.AddFilter(filters::http);
+        endPointConnection.Send(buffer, size);
+
+        auto message = endPointConnection.Receive();
+        write(m_fd, message.data(), message.size());
+
       } catch (const InternalServerException& e) {
         std::string iseDocument =
             "<!DOCTYPE html><html><head><title>Internal Server "
@@ -43,6 +54,9 @@ void TcpClient::RunHandler() {
         break;
       } catch (const NotEnoughDataException) {
         continue;
+      } catch (const std::exception& e) {
+        fmt::print("Server error: {}\n", e.what());
+        break;
       }
 
       std::string message =

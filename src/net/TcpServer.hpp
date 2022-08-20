@@ -12,13 +12,6 @@
 #include <type_traits>
 #include <unordered_map>
 
-extern "C" {
-#include <fcntl.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <unistd.h>
-}
-
 namespace dlbs {
 class TcpServer : public HotThread {
  public:
