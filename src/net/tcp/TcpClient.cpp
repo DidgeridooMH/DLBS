@@ -16,11 +16,14 @@ using namespace std::chrono;
 using namespace std::chrono_literals;
 
 namespace dlbs {
-TcpClient::TcpClient(int fd, const std::string& address, uint16_t port)
+TcpClient::TcpClient(int fd, const std::string& address, uint16_t port,
+                     uint32_t endPointAddress, uint16_t endPointPort)
     : m_fd(fd),
       m_address(address),
       m_port(port),
-      m_context(EndPointContext{.keepAlive = false}) {
+      m_context(EndPointContext{.keepAlive = false,
+                                .endPointAddress = endPointAddress,
+                                .endPointPort = endPointPort}) {
   fmt::print("[DEBUG] - Client connected at {}:{}\n", address, port);
 }
 
@@ -42,7 +45,8 @@ void TcpClient::RunHandler() {
           f(buffer, size, m_context);
         }
 
-        auto endPointConnection = EndPointConnection("127.0.0.1", 3000);
+        auto endPointConnection = EndPointConnection(m_context.endPointAddress,
+                                                     m_context.endPointPort);
         endPointConnection.AddFilter(filters::http);
         endPointConnection.Send(buffer, size);
 

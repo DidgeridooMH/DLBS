@@ -6,7 +6,7 @@
 namespace dlbs {
 class EndPointConnection {
  public:
-  EndPointConnection(const std::string& address, uint16_t port);
+  EndPointConnection(uint32_t address, uint16_t port);
 
   ~EndPointConnection();
 

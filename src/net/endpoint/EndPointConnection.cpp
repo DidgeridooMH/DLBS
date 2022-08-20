@@ -23,15 +23,14 @@ using namespace std::chrono;
 using namespace std::chrono_literals;
 
 namespace dlbs {
-EndPointConnection::EndPointConnection(const std::string& address,
-                                       uint16_t port) {
+EndPointConnection::EndPointConnection(uint32_t address, uint16_t port) {
   m_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (m_fd < 0) {
     throw std::runtime_error(
         fmt::format("Unable to create socket: {}", strerror(errno)));
   }
 
-  sockaddr_in sockAddress = {.sin_addr = {.s_addr = inet_addr(address.c_str())},
+  sockaddr_in sockAddress = {.sin_addr = {.s_addr = address},
                              .sin_family = AF_INET,
                              .sin_len = sizeof(sockaddr_in),
                              .sin_port = htons(port),

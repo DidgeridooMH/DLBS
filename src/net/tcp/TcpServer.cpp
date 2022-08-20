@@ -53,6 +53,12 @@ void TcpServer::RunHandler() {
 
   fmt::print("Server started on port {}\n", m_port);
 
+  const std::vector<std::pair<uint32_t, uint16_t>> endPointList = {
+      {inet_addr("127.0.0.1"), 3000},
+      {inet_addr("127.0.0.1"), 3001},
+      {inet_addr("127.0.0.1"), 3002}};
+  size_t epIndex = 0;
+
   while (GetState() != ThreadState::Stopping) {
     sockaddr_in clientAddress;
     socklen_t addressLength = sizeof(clientAddress);
@@ -61,7 +67,9 @@ void TcpServer::RunHandler() {
     if (clientFd >= 0) {
       auto client = std::make_unique<TcpClient>(
           clientFd, inet_ntoa(clientAddress.sin_addr),
-          ntohs(clientAddress.sin_port));
+          ntohs(clientAddress.sin_port), endPointList[epIndex].first,
+          endPointList[epIndex].second);
+      epIndex = (epIndex + 1) % endPointList.size();
       client->AddFilter(filters::http);
       m_clients.insert({clientAddress.sin_port, std::move(client)});
       m_clients.at(clientAddress.sin_port)->Run();

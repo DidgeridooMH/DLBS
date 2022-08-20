@@ -11,7 +11,8 @@ namespace dlbs {
 
 class TcpClient : public HotThread {
  public:
-  TcpClient(int fd, const std::string& address, uint16_t port);
+  TcpClient(int fd, const std::string& address, uint16_t port,
+            uint32_t endPointAddress, uint16_t endPointPort);
 
   void AddFilter(NetFilter filter);
 
